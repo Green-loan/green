@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>Stokvela | Rules</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #222;
+      color: white;
+      padding: 20px 0;
+    }
+
+    .nav__bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .nav__logo a {
+      color: #fff;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    .section__container {
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .section__container h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    ul.rules-list {
+      text-align: left;
+      background-color: #fff;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    ul.rules-list li {
+      margin: 10px 0;
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .accept-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-weight: bold;
+    }
+
+    .accept-btn:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="nav__bar">
+      <div class="nav__logo">
+        <a href="investment.html">Stokvela</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section__container">
+    <h1>Stokvela Rules</h1>
+    <ul class="rules-list">
+      <li>All payments must be made before or on the due date.</li>
+      <li>Late payments incur a penalty fee of 20% of the contribution amount.</li>
+      <li>Each member will receive the collected contributions in rotation, once per cycle.</li>
+      <li>Members must notify the group administrator in advance if unable to contribute on time.</li>
+      <li>Repeated late payments (3 or more) may result in removal from the Stokvela group.</li>
+      <li>All disputes must be resolved amicably with the group administrator.</li>
+    </ul>
+    <button class="accept-btn" onclick="acceptRules()">Accept</button>
+  </div>
+
+  <script>
+    function acceptRules() {
+      // Trigger SweetAlert success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Rules Accepted',
+        text: 'You have successfully accepted the rules. Proceeding to the next step.',
+        confirmButtonText: 'Proceed',
+        confirmButtonColor: '#4caf50'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Redirect to the next page after confirming
+          window.location.href = "stokvela.html"; // Change the URL as needed
+        }
+      });
+    }
+  </script>
+</body>
+</html>

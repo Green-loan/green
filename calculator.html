@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Investment Calculator | Green Loan</title>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <div class="nav__bar">
+        <div class="nav__header">
+          <div class="nav__logo">
+            <a href="index.html">Green Loan<span>.</span></a>
+          </div>
+                 </div>
+      </div>
+    </nav>
+    <div class="section__container header__container">
+      <h1>Investment & Loan Calculator</h1>
+      <p>Calculate your returns or repayment amount easily!</p>
+    </div>
+  </header>
+
+  <main class="section__container calculator__container">
+    <h2 class="section__header">Calculator</h2>
+    <p>Use the calculator below to estimate the total amount for your investment or loan.</p>
+
+    <form id="calculatorForm" class="form__group">
+      <div class="form__group">
+        <label for="amount">Enter Amount (e.g., Investment or Loan):</label>
+        <input type="number" id="amount" name="amount" placeholder="Enter amount" required />
+      </div>
+      <div class="form__group">
+        <label for="interest">Enter Interest Rate (%):</label>
+        <input type="number" id="interest" name="interest" placeholder="Enter interest rate" required />
+      </div>
+      <div class="form__group">
+        <label for="years">Duration (Months):</label>
+        <input type="number" id="years" name="years" placeholder="Enter duration in Months" required />
+      </div>
+      <button type="button" onclick="calculateTotal()">Calculate</button>
+    </form>
+
+    <div class="result__container">
+      <h4>Result:</h4>
+      <p id="result">Your total amount will appear here.</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="section__container footer__container">
+      <div class="footer__col">
+        <h5><a href="index.html">Green Loan</a></h5>
+        <p>Your reliable partner for quick, hassle-free loan services and investment opportunities.</p>
+        <div class="footer__socials">
+          <a href="mailto:clintonbonganikhoza@gmail.com"><i class="ri-mail-fill"></i></a>
+          <a href="https://www.facebook.com/greenloan"><i class="ri-facebook-fill"></i></a>
+          <a href="https://linkedin.com/company/greenloan"><i class="ri-linkedin-fill"></i></a>
+          <a href="https://twitter.com/greenloan"><i class="ri-twitter-fill"></i></a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h4>Quick Links</h4>
+        <div class="footer__links">
+          <a href="index.html#services">Our Services</a>
+          <a href="index.html#about">About Us</a>
+          <a href="index.html#contact">Contact Us</a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <div class="footer__links">
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function calculateTotal() {
+      const amount = parseFloat(document.getElementById("amount").value);
+      const interest = parseFloat(document.getElementById("interest").value) / 100;
+      const years = parseInt(document.getElementById("years").value);
+
+      if (!isNaN(amount) && !isNaN(interest) && !isNaN(years)) {
+        const total = amount * Math.pow(1 + interest, years);
+        document.getElementById("result").textContent = 
+          `Your total amount after ${years} month(s) with ${interest * 100}% interest will be: R${total.toFixed(2)}`;
+      } else {
+        document.getElementById("result").textContent = "Please enter valid numbers in all fields.";
+      }
+    }
+  </script>
+</body>
+</html>

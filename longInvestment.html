@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: gold;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .top-nav {
+      background-color: #222;
+      padding: 15px;
+      text-align: center;
+      color: gold;
+      font-size: 20px;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+   #scrolling-message-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background-color: black; /* Adjust background color */
+}
+
+#scrolling-message {
+  white-space: nowrap;
+  position: absolute;
+  animation: scrollMessage 20s linear infinite;
+  font-size: 20px; /* Adjust text size */
+  color: white; /* Adjust text color */
+}
+
+ #calendar {
+    color: white;
+  }
+
+@keyframes scrollMessage {
+  from {
+    left: 100%; /* Start off-screen on the right */
+  }
+  to {
+    left: -100%; /* Move off-screen to the left */
+  }
+}
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .investment-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .chart-container {
+      width: 300px;
+      height: 300px;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #388E3C;
+      color: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid gold;
+    }
+
+    th {
+      background-color: #2C6B2F;
+    }
+
+    .progress-container {
+      width: 100%;
+      background-color: #444;
+      border-radius: 4px;
+    }
+
+    .progress-bar {
+      height: 10px;
+      background-color: gold;
+      border-radius: 4px;
+    }
+
+    .calendar {
+      background-color: #222;
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .invest-button {
+      background-color: gold;
+      color: black;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    .payment-grid {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .payment-option {
+      cursor: pointer;
+      border: 2px solid gold;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+    }
+
+    .payment-option img {
+      width: 100px;
+      height: auto;
+    }
+
+    .swal2-popup {
+      background-color: #121212;
+      color: gold;
+    }
+
+    .swal2-input, .swal2-file, .swal2-select {
+      background-color: #222;
+      color: gold;
+      border: 1px solid gold;
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+
+    .swal2-input::placeholder, .swal2-file::placeholder {
+      color: #888;
+    }
+
+    .swal2-checkbox label {
+      color: gold;
+    }
+
+    .swal2-confirm {
+      background-color: gold;
+      color: black;
+    }
+
+    .swal2-cancel {
+      background-color: #444;
+      color: gold;
+    }
+
+    .terms-link {
+      color: gold;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+     .custom-input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+    .payment-instructions {
+      background-color: #2C6B2F;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .payment-instructions p {
+      margin: 5px 0;
+    }
+    .top-nav {
+  height: 60px; /* Increased height */
+  line-height: 60px; /* Align text vertically */
+  background-color: rgba(46, 204, 113, 0.7); /* Transparent green */
+  color: white; /* White text for contrast */
+  padding: 10px 20px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  border-bottom: 3px solid rgba(39, 174, 96, 0.8); /* Slightly darker transparent green */
+}
+
+.scrolling-text {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+}
+ .invest-button, .withdraw-button {
+    width: 150px; /* Equal width for both buttons */
+    height: 40px; /* Equal height for both buttons */
+    font-size: 16px; /* Set font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    margin: 5px; /* Margin between buttons */
+  }
+
+  .invest-button {
+    background-color: #007bff; /* Blue for invest */
+    color: white; /* White text */
+  }
+
+  .withdraw-button {
+    background-color: green; /* Green for withdraw */
+    color: white; /* White text */
+  }
+
+  .invest-button:hover, .withdraw-button:hover {
+    opacity: 0.9; /* Slightly transparent on hover */
+  }
+  .back-icon {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 24px;
+  color: gold;
+  text-decoration: none;
+  padding: 10px;
+}
+
+.back-icon:hover {
+  color: #ccc;
+}
+
+
+  </style>
+    <div class="top-nav">
+    <span id="scrolling-message" class="scrolling-text"></span>
+  </div>
+  
+</head>
+<body>
+     <h1><a href="investment.html" class="back-icon">
+    <i class="ri-arrow-left-line"></i> Back
+  </a></h1>
+    <h1>Your investments</h1>
+    <div class="calendar" id="calendar"></div>
+    <button class="invest-button" onclick="showInvestOptions()">Invest</button>
+    <button class="withdraw-button" onclick="window.location.href='withdraw.html'">Withdraw</button>
+    <div class="investment-section">
+      <div class="chart-container">
+        <canvas id="investmentChart"></canvas>
+      </div>
+     </div>
+  </div>
+
+  <script>
+       window.onload = function() {
+      const loggedInUser = localStorage.getItem('loggedInUser');
+      if (loggedInUser) {
+        document.getElementById('logged-in-user').innerText = `Welcome, ${loggedInUser}`;
+      }
+    };
+
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('calendar').innerHTML = now.toDateString() + ' ' + now.toLocaleTimeString();
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function showInvestOptions() {
+      Swal.fire({
+        title: 'Investment Options',
+        showDenyButton: true,
+        confirmButtonText: 'Deposit',
+        showDenyButton: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          showDepositForm();
+        } else if (result.isDenied) {
+          Swal.fire('Edit Investment Selected', '', 'info');
+        }
+      });
+    }
+    window.onload = function() { 
+  const loggedInUser = localStorage.getItem('loggedInUser') || 'Guest';
+  const message = `Welcome, ${loggedInUser}, We have anual investment with the interests of 40%, Invest and let your money work for you `;
+  document.getElementById('scrolling-message').innerText = message;
+  
+
+};
+
+    function showDepositForm() {
+      Swal.fire({
+        title: 'Deposit Funds',
+        html: `
+          <div class="payment-grid">
+            <div class="payment-option" onclick="showPaypalPopup()">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
+            </div>
+            <div class="payment-option" onclick="redirectToInvestmentForm()">
+            <img src="assets/stand.png" alt="Standard Bank">
+            </div>
+
+          </div>
+        `,
+        showConfirmButton: false,
+      });
+    }
+
+    function showPaypalPopup() {
+      window.open('https://www.paypal.com/signin', 'PayPal', 'width=500,height=600');
+    }
+
+        function redirectToInvestmentForm() {
+  window.location.href = "investmentform.html";
+}
+
+    function calculateAmountToReceive() {
+      const amountInvested = document.getElementById('amount').value;
+      if (amountInvested) {
+        const amountToReceive = amountInvested * 0.4; // 40% of the investment
+        document.getElementById('amountToReceive').value = amountToReceive.toFixed(2);
+      } else {
+        document.getElementById('amountToReceive').value = '';
+      }
+    }
+
+    function showTerms() {
+      Swal.fire({
+        title: 'Terms and Conditions',
+        html: `
+          <div style="text-align: left;">
+            <p>1. By investing, you agree to the terms outlined here.</p>
+            <p>2. The amount to receive is calculated as 40% of the investment amount.</p>
+            <p>3. You must provide accurate personal and banking details.</p>
+            <p>4. Proof of payment must be uploaded for verification.</p>
+            <p>5. Investments are subject to market risks.</p>
+          </div>
+        `,
+        confirmButtonText: 'Close',
+      });
+    }
+
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Stokvela | Green Loan</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Black with transparency */
+  overflow: auto;
+  padding-top: 60px;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 10px;
+}
+
+.close-btn {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+    .header {
+      background-color: #222;
+      color: white;
+      padding: 20px 0;
+    }
+
+    .nav__bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav__logo a {
+      color: #fff;
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    .section__container {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .section__container h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .profile-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 250px;
+      height: 350px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin: 0 auto;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-card img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+      border: 2px solid #4caf50;
+    }
+
+    .profile-card h3 {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      color: #333;
+    }
+
+    .profile-card p {
+      font-size: 0.9rem;
+      margin: 5px 0;
+      color: #555;
+    }
+
+    .profile-card .user-number {
+      font-weight: bold;
+      color: #444;
+    }
+
+    .profile-card button {
+      padding: 5px 10px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .add-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    #pagination {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    #pagination button {
+      font-size: 16px;
+      padding: 8px 12px;
+      margin: 0 5px;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #pagination button:hover {
+      background-color: #666;
+      transform: scale(1.1);
+    }
+
+    #pagination button.active {
+      background-color: #4caf50;
+    }
+
+    /* Progress Bar Styles */
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar .progress {
+      height: 100%;
+      background-color: #4caf50;
+      border-radius: 5px;
+    }
+
+    .progress-bar span {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #fff;
+      line-height: 10px;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="section__container">
+   <div id="profileGrid" class="profile-grid"></div>
+  <div id="pagination"></div>
+ </div>
+
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCWoEdf5p3T8DfJX3IWw3s6PNWKjXdo9-s",
+    authDomain: "robot-1ed2b.firebaseapp.com",
+    databaseURL: "https://robot-1ed2b-default-rtdb.firebaseio.com",
+    projectId: "robot-1ed2b",
+    storageBucket: "robot-1ed2b.appspot.com",
+    messagingSenderId: "71843575877",
+    appId: "1:71843575877:android:61b8b09dc5bf5d21158b2c",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  async function fetchInvestments() {
+    const dbRef = ref(database);
+    try {
+      const snapshot = await get(child(dbRef, "investments"));
+      if (snapshot.exists()) {
+        const investments = Object.values(snapshot.val());
+        displayInvestments(investments);
+      } else {
+        document.getElementById("profileGrid").innerHTML = `<p>No investments found.</p>`;
+      }
+    } catch (error) {
+      console.error("Error fetching investments:", error);
+      document.getElementById("profileGrid").innerHTML = `<p>Failed to fetch investments.</p>`;
+    }
+  }
+
+  function displayInvestments(investments) {
+    const profileGrid = document.getElementById("profileGrid");
+    const loggedInUser = localStorage.getItem("loggedInUser") || "Guest";
+
+    // Filter investments for the logged-in user
+    const userInvestments = investments.filter(investment => investment.fullName === loggedInUser);
+
+    const ctx = document.getElementById('investmentChart').getContext('2d');
+
+if (userInvestments.length > 0) {
+    const totalInvestment = userInvestments.reduce((sum, investment) => sum + investment.amountInvesting, 0);
+    const totalReturns = userInvestments.reduce((sum, investment) => sum + investment.amountToReceive, 0);
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Investment', 'Returns'],
+            datasets: [{
+                data: [totalInvestment, totalReturns],
+                backgroundColor: ['gold', '#388E3C'],
+            }]
+        }
+    });
+
+    profileGrid.innerHTML = userInvestments.map(investment => `
+        <div class="profile-card">
+    <h3>${investment.fullName}</h3>
+    <p>Investment: R${investment.amountInvesting}</p>
+    <p>Returns: R${investment.amountToReceive}</p>
+    <p>Period: ${investment.investmentPeriod} year(s)</p>
+    <p>Bank: ${investment.bank}</p>
+    <p>Account Number: ${investment.accountNumber}</p>
+    <p>Status: 
+        ${investment.isActive ? 
+            '<span style="color: green;">&#10004; Active</span>' : 
+            '<span style="color: red;">&#10008; Not Active</span>'}
+    </p>
+    <p>Confirmed: 
+        ${investment.isConfirmed ? 
+            '<span style="color: green;">&#10004; Confirmed</span>' : 
+            '<span style="color: red;">&#10008; Not Confirmed</span>'}
+    </p>
+    <p>Invested Day: ${investment.timestamp}</p>
+</div>
+
+    `).join("");
+} else {
+    profileGrid.innerHTML = `<p style="color: red;">You don't have an investment</p>`;
+}
+}
+function showWithdrawOptions() {
+  window.location.href = "withdraw.html";  // Redirect to withdraw.html
+}
+
+
+
+  fetchInvestments();
+</script>
+
+</body>
+</html>

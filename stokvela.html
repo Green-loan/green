@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stokvela Management</title>
+    <!-- Include SweetAlert Library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include DataTables and SweetAlert -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: white;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            padding: 15px 30px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .dark-mode .navbar {
+            background: linear-gradient(90deg, #28a745, #52a447);
+        }
+
+        .nav-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .chart-container {
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+        .profile {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .profile:hover img {
+            transform: scale(1.1);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            width: 200px;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .dropdown.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .dropdown a:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .menu-icon {
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-icon.active {
+            transform: rotate(90deg);
+        }
+
+        /* Side Navigation Styles */
+        .side-nav {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background: #333;
+            color: white;
+            padding: 20px;
+            transition: left 0.3s ease;
+            z-index: 2000;
+        }
+
+        .side-nav.active {
+            left: 0;
+        }
+
+        .side-nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 0;
+        }
+
+        .side-nav a:hover {
+            background: #007bff;
+            padding-left: 10px;
+            transition: 0.3s;
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Form Container Styles */
+        .container {
+            padding: 20px;
+            margin-top: 80px; /* Adjust for navbar */
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+       
+        .side-nav.active ~ .container {
+            margin-left: 250px;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+
+        .form-group button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Table Styles */
+        .table-container {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dark-mode table {
+            background-color: #333;
+            color: white;
+        }
+
+        .dark-mode th {
+            background-color: #28a745;
+        }
+
+        .dark-mode tr:hover {
+            background-color: #444;
+        }
+
+        /* Rotate Button Styles */
+        .rotate-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .rotate-button:hover {
+            background-color: #0056b3;
+        }
+        .rotate-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .rotate-button:hover {
+            background-color: #0056b3;
+        }
+        .rotate-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .rotate-button:hover {
+            background-color: #0056b3;
+        }
+        .rotate-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        /* Blur effect for specific cells */
+.blur {
+    filter: blur(3px);
+    transition: filter 0.3s ease;
+}
+
+.blur:hover {
+    filter: blur(0);
+}
+        .rotate-button:hover {
+            background-color: #0056b3;
+        }
+        .rotate-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .rotate-button:hover {
+            background-color: #0056b3;
+        }
+        .edit-btn {
+            background-color: #007bff; /* Blue */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545; /* Red */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit-btn, .delete-btn {
+            width: 60px; /* Equal width */
+        }
+
+
+        .blur {
+            filter: blur(3px);
+            transition: filter 0.3s ease;
+        }
+
+        .blur:hover {
+            filter: blur(0);
+        }
+
+        .chart-container {
+            max-width: 400px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="menu-icon" onclick="toggleNav()">&#8942;</div>
+        <div class="nav-title"><span id="user-name">Guest</span></div>
+    </nav>
+
+    <!-- Side Navigation -->
+    <div class="side-nav" id="sideNav">
+        <span class="close-icon" onclick="toggleNav()">&times;</span>
+        <h2>Settings</h2>
+        <a href="#">Privacy</a>
+        <a href="index.html">Logout</a>
+     </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Stokvela Members</h1>
+        <div class="form-container" id="formContainer" style="display: none;">
+            <form id="addMemberForm">
+            <div class="form-group">
+                <label for="userNumber">User Number:</label>
+                <input type="text" id="userNumber" name="userNumber" required disabled />
+            </div>
+            <div class="form-group">
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="fullName" required />
+            </div>
+            <div class="form-group">
+                <label for="accountNumber">Account Number:</label>
+                <input type="text" id="accountNumber" name="accountNumber" required />
+            </div>
+            <div class="form-group">
+                <label for="accountName">Account Name:</label>
+                <input type="text" id="accountName" name="accountName" required />
+            </div>
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth:</label>
+                <input type="date" id="dateOfBirth" name="dateOfBirth" required />
+            </div>
+            <div class="form-group">
+                <label for="amountPaid">Amount Paid:</label>
+                <input type="number" id="amountPaid" name="amountPaid" required />
+            </div>
+            <div class="form-group">
+    <label for="amountToReceive">Amount to Receive:</label>
+    <input type="number" id="amountToReceive" name="amountToReceive" required disabled readonly />
+</div>
+<div class="form-group">
+    <label for="receivingDate">Receiving Date:</label>
+    <input type="date" id="receivingDate" name="receivingDate" required disabled readonly />
+</div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+                <label for="cellphone">Cellphone Number:</label>
+                <input type="tel" id="cellphone" name="cellphone" required />
+            </div>
+            <div class="form-group">
+                <button type="submit">Update Payment</button>
+            </div>
+        </form>
+
+        </div>
+        <!-- Pie Chart Container -->
+        <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+        </div>
+        <!-- Table for Stokvela Members -->
+        <div class="table-container">
+            <h2></h2>
+            <table id="stokvelaTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>User Number</th>
+                        <th>Full Name</th>
+                        <th>Account Number</th>
+                        <th>Account Name</th>
+                        <th>Date of Birth</th>
+                        <th>Amount Paid</th>
+                        <th>Amount to Receive</th>
+                        <th>Receiving Date</th>
+                        <th>Email</th>
+                        <th>Cellphone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="stokvelaTableBody">
+                    <!-- Data from Firebase will go here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+           import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, push, get, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCWoEdf5p3T8DfJX3IWw3s6PNWKjXdo9-s",
+        authDomain: "robot-1ed2b.firebaseapp.com",
+        databaseURL: "https://robot-1ed2b-default-rtdb.firebaseio.com",
+        projectId: "robot-1ed2b",
+        storageBucket: "robot-1ed2b.appspot.com",
+        messagingSenderId: "71843575877",
+        appId: "1:71843575877:android:61b8b09dc5bf5d21158b2c"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Fetch and display Stokvela members
+    function fetchStokvelaMembers() {
+        const membersRef = ref(database, "stokvela_members");
+        onValue(membersRef, (snapshot) => {
+            const members = snapshot.exists() ? Object.entries(snapshot.val()) : [];
+            const tableBody = document.getElementById("stokvelaTableBody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            const loggedInUser = localStorage.getItem("loggedInUser").toLowerCase();
+
+            members.forEach(([key, member]) => {
+                const isUserOne = member.userNumber === "#1";
+                const fullName = member.fullName.toLowerCase();
+                const isLoggedInUser = fullName === loggedInUser;
+
+                const row = `
+                    <tr>
+                        <td>${member.userNumber}</td>
+                        <td>${member.fullName}</td>
+                        <td class="${isUserOne ? '' : 'blur'}">${member.accountNumber}</td>
+                        <td>${member.accountName}</td>
+                        <td class="${isUserOne ? '' : 'blur'}">${member.dateOfBirth}</td>
+                        <td>R${member.amountPaid.toFixed(2)}</td>
+                        <td>R${member.amountToReceive.toFixed(2)}</td>
+                        <td>${member.receivingDate}</td>
+                        <td class="${isUserOne ? '' : 'blur'}">${member.email}</td>
+                        <td class="${isUserOne ? '' : 'blur'}">${member.cellphone}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editMember('${key}')" ${isLoggedInUser ? '' : 'disabled'}>Update</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            // Initialize DataTables
+            $('#stokvelaTable').DataTable().destroy(); // Destroy existing instance
+            $('#stokvelaTable').DataTable(); // Reinitialize
+        });
+    }
+
+    // Function to update a member
+    window.updateMember = function (key) {
+        const membersRef = ref(database, `stokvela_members/${key}`);
+        const updatedData = {
+            userNumber: `#${document.getElementById("userNumber").value}`,
+            fullName: document.getElementById("fullName").value,
+            accountNumber: document.getElementById("accountNumber").value,
+            accountName: document.getElementById("accountName").value,
+            dateOfBirth: document.getElementById("dateOfBirth").value,
+            amountPaid: parseFloat(document.getElementById("amountPaid").value),
+            amountToReceive: parseFloat(document.getElementById("amountToReceive").value),
+            receivingDate: document.getElementById("receivingDate").value,
+            email: document.getElementById("email").value,
+            cellphone: document.getElementById("cellphone").value
+        };
+
+        update(membersRef, updatedData).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Member updated successfully!',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Hide the form after successful update
+                document.getElementById("formContainer").style.display = "none";
+                // Refresh the table
+                fetchStokvelaMembers();
+            });
+        }).catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to update member. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        });
+    };
+
+
+        // Create Pie Chart
+        function createPieChart(amountPaid, amountToReceive) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            const pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Amount Paid', 'Amount to Receive'],
+                    datasets: [{
+                        data: [amountPaid, amountToReceive],
+                        backgroundColor: ['#007bff', '#28a745'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+
+        // Fetch data for user number one and create the pie chart
+        function fetchUserOneData() {
+            const membersRef = ref(database, "stokvela_members");
+            onValue(membersRef, (snapshot) => {
+                const members = snapshot.exists() ? Object.entries(snapshot.val()) : [];
+                const userOne = members.find(([key, member]) => member.userNumber === "#1");
+
+                if (userOne) {
+                    const amountPaid = userOne[1].amountPaid;
+                    const amountToReceive = userOne[1].amountToReceive;
+                    createPieChart(amountPaid, amountToReceive);
+                }
+            });
+        }    
+       window.editMember = function (key) {
+    const membersRef = ref(database, `stokvela_members/${key}`);
+    get(membersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            const member = snapshot.val();
+            // Populate the form with the member's data
+            document.getElementById("userNumber").value = member.userNumber.replace("#", "");
+            document.getElementById("fullName").value = member.fullName;
+            document.getElementById("accountNumber").value = member.accountNumber;
+            document.getElementById("accountName").value = member.accountName;
+            document.getElementById("dateOfBirth").value = member.dateOfBirth;
+            document.getElementById("amountPaid").value = member.amountPaid;
+            document.getElementById("amountToReceive").value = member.amountToReceive;
+            document.getElementById("receivingDate").value = member.receivingDate;
+            document.getElementById("email").value = member.email;
+            document.getElementById("cellphone").value = member.cellphone;
+
+            // Show the form
+            document.getElementById("formContainer").style.display = "block";
+
+            // Enable the "Receiving Date" and "Amount to Receive" fields
+            document.getElementById("receivingDate").disabled = false;
+            document.getElementById("amountToReceive").disabled = false;
+
+            // Change the form's submit button to update the member
+            const form = document.getElementById("addMemberForm");
+            form.onsubmit = (event) => {
+                event.preventDefault();
+                updateMember(key);
+            };
+            form.querySelector("button").textContent = "Update Member";
+
+            // Scroll to the form
+            document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+};
+
+        // Initialize data
+        fetchStokvelaMembers();
+        fetchUserOneData();
+    </script>
+
+        <script>
+        // Set the logged-in user's name
+        document.addEventListener("DOMContentLoaded", function () {
+            const loggedInUser = localStorage.getItem("loggedInUser");
+            if (loggedInUser) {
+                document.getElementById("user-name").textContent = loggedInUser;
+            } else {
+                document.getElementById("user-name").textContent = "Guest";
+            }
+
+            // Set the theme based on localStorage
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark-mode") {
+                document.body.classList.add("dark-mode");
+                document.getElementById("themeSwitch").checked = true;
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+        const loggedInUserName = document.getElementById("user-name").innerText.trim().toLowerCase();
+
+        document.querySelectorAll("#stokvelaTable tbody tr").forEach(row => {
+            const fullName = row.cells[1].innerText.trim().toLowerCase();
+            const [firstName, lastName] = fullName.split(" "); // Assumes names are "First Last"
+            const [loggedFirstName, loggedLastName] = loggedInUserName.split(" ");
+
+            const editButton = row.querySelector(".edit-btn");
+
+            if (firstName === loggedFirstName && lastName === loggedLastName) {
+                editButton.disabled = false; // Enable edit button for the matched user
+            } else {
+                editButton.disabled = true; // Disable for others
+            }
+        });
+    }, 2000); // Give some time for the table to load
+});
+   function createPieChart(amountPaid, amountToReceive) {
+    const ctx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Amount Paid', 'Amount to Receive'],
+            datasets: [{
+                data: [amountPaid, amountToReceive],
+                backgroundColor: ['#007bff', '#28a745'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+}   
+
+
+// Fetch data for user number one and create the pie chart
+function fetchUserOneData() {
+    const membersRef = ref(database, "stokvela_members");
+    onValue(membersRef, (snapshot) => {
+        const members = snapshot.exists() ? Object.entries(snapshot.val()) : [];
+        const userOne = members.find(([key, member]) => member.userNumber === "#1");
+
+        if (userOne) {
+            const amountPaid = userOne[1].amountPaid;
+            const amountToReceive = userOne[1].amountToReceive;
+            createPieChart(amountPaid, amountToReceive);
+        }
+    });
+}
+function editMember(key) {
+    const membersRef = ref(database, `stokvela_members/${key}`);
+    get(membersRef).then((snapshot) => {
+        if (snapshot.exists()) {
+            const member = snapshot.val();
+            document.getElementById("userNumber").value = member.userNumber;
+            document.getElementById("fullName").value = member.fullName;
+            document.getElementById("accountNumber").value = member.accountNumber;
+            document.getElementById("accountName").value = member.accountName;
+            document.getElementById("dateOfBirth").value = member.dateOfBirth;
+            document.getElementById("amountPaid").value = member.amountPaid;
+            document.getElementById("amountToReceive").value = member.amountToReceive;
+            document.getElementById("receivingDate").value = member.receivingDate;
+            document.getElementById("email").value = member.email;
+            document.getElementById("cellphone").value = member.cellphone;
+
+            // Show the form
+            document.getElementById("formContainer").style.display = "block";
+        }
+    });
+}
+// Call this function after initializing Firebase
+fetchUserOneData();
+
+        // Theme toggle
+        document.getElementById("themeSwitch").addEventListener("change", function () {
+            const isDarkMode = this.checked;
+            document.body.classList.toggle("dark-mode", isDarkMode);
+
+            // Save the theme preference in localStorage
+            if (isDarkMode) {
+                localStorage.setItem("theme", "dark-mode");
+            } else {
+                localStorage.removeItem("theme");
+            }
+        });
+
+        // Toggle side navigation
+        function toggleNav() {
+            let sideNav = document.getElementById("sideNav");
+            let menuIcon = document.querySelector(".menu-icon");
+            sideNav.classList.toggle("active");
+            menuIcon.classList.toggle("active");
+        }
+    </script>
+</body>
+</html>

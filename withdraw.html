@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw Funds</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getDatabase, ref, push, set, get, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWoEdf5p3T8DfJX3IWw3s6PNWKjXdo9-s",
+            authDomain: "robot-1ed2b.firebaseapp.com",
+            databaseURL: "https://robot-1ed2b-default-rtdb.firebaseio.com",
+            projectId: "robot-1ed2b",
+            storageBucket: "robot-1ed2b.appspot.com",
+            messagingSenderId: "71843575877",
+            appId: "1:71843575877:android:61b8b09dc5bf5d21158b2c",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        async function submitWithdrawal() {
+    try {
+        const loggedInUser = localStorage.getItem("loggedInUser") || "Guest";
+        const amount = document.getElementById("withdrawAmount").value;
+        const bank = document.getElementById("bank").value;
+        const accountNumber = document.getElementById("accountNumber").value;
+
+        if (!amount || !bank || !accountNumber) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        const withdrawalRef = ref(database, "withdrawals");
+        const newWithdrawal = push(withdrawalRef);
+        console.log("Sending withdrawal data...");
+        await set(newWithdrawal, {
+            fullName: loggedInUser,
+            amount: parseFloat(amount),
+            bank: bank,
+            accountNumber: accountNumber,
+            timestamp: new Date().toLocaleString(),
+            isProcessed: false
+        });
+        console.log("Withdrawal data sent successfully!");
+
+        // SweetAlert success popup
+        Swal.fire({
+            icon: 'success',
+            title: 'Withdrawal Submitted',
+            text: 'Your withdrawal request has been successfully submitted.'
+        }).then(() => {
+            document.getElementById("withdrawForm").reset();
+            fetchWithdrawals();
+        });
+    } catch (error) {
+        console.error("Error submitting withdrawal:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Submission Failed',
+            text: 'There was an error submitting your withdrawal request.'
+        });
+    }
+}
+
+        async function fetchWithdrawals() {
+            const loggedInUser = localStorage.getItem("loggedInUser") || "Guest";
+            const dbRef = ref(database);
+            try {
+                const snapshot = await get(child(dbRef, "withdrawals"));
+                if (snapshot.exists()) {
+                    const withdrawals = Object.values(snapshot.val()).filter(w => w.fullName === loggedInUser);
+                    displayWithdrawals(withdrawals);
+                } else {
+                    document.getElementById("withdrawalGrid").innerHTML = `<p>No withdrawals found.</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching withdrawals:", error);
+                document.getElementById("withdrawalGrid").innerHTML = `<p>Failed to fetch withdrawals.</p>`;
+            }
+        }
+
+        function displayWithdrawals(withdrawals) {
+            const withdrawalGrid = document.getElementById("withdrawalGrid");
+            
+            if (withdrawals.length > 0) {
+                withdrawalGrid.innerHTML = withdrawals.map(withdrawal => `
+                    <div class="profile-card">
+                        <h3>${withdrawal.fullName}</h3>
+                        <p>Amount: R${withdrawal.amount}</p>
+                        <p>Bank: ${withdrawal.bank}</p>
+                        <p>Account Number: ${withdrawal.accountNumber}</p>
+                        <p>Status: 
+                            ${withdrawal.isProcessed ? 
+                                '<span style="color: green;">&#10004; Processed</span>' : 
+                                '<span style="color: red;">&#10008; Pending</span>'}
+                        </p>
+                        <p>Requested On: ${withdrawal.timestamp}</p>
+                    </div>
+                `).join("");
+            } else {
+                withdrawalGrid.innerHTML = `<p style="color: red;">No withdrawal requests found.</p>`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchWithdrawals);
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: gold;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            margin-top: 50px;
+            font-size: 36px;
+        }
+        .form-container {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
+        }
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid gold;
+            background-color: #333;
+            color: gold;
+            font-size: 16px;
+        }
+        .form-container button {
+            background-color: gold;
+            color: black;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .form-container button:hover {
+            background-color: darkgoldenrod;
+        }
+        .profile-card {
+            background-color: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(255, 215, 0, 0.5);
+        }
+        .profile-card h3 {
+            margin: 0 0 10px;
+            font-size: 22px;
+        }
+        .profile-card p {
+            margin: 5px 0;
+        }
+        .profile-card p span {
+            font-weight: bold;
+        }
+        #withdrawalGrid {
+            margin-top: 30px;
+        }
+    </style>
+ <a href="longInvestment.html">
+        <i class="fas fa-arrow-left" style="font-size: 24px; color: gold; text-decoration: none;"></i>
+        <span>Back</span>
+    </a>
+</head>
+<body>
+    <h1>Withdraw Funds</h1>
+    <div class="form-container">
+        <form id="withdrawForm" onsubmit="event.preventDefault(); submitWithdrawal();">
+            <label for="withdrawAmount">Amount to Withdraw (R):</label>
+            <input type="number" id="withdrawAmount" required>
+            
+            <label for="bank">Bank Name:</label>
+            <input type="text" id="bank" required>
+            
+            <label for="accountNumber">Account Number:</label>
+            <input type="text" id="accountNumber" required>
+            
+            <button type="submit">Submit Withdrawal</button>
+        </form>
+    </div>
+    
+    <h2>Your Withdrawals</h2>
+    <div id="withdrawalGrid"></div>
+</body>
+</html>

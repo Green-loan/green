@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Investment Opportunities | Green Loan</title>
+  <style>
+    /* Add custom styles for the profile icon and dropdown */
+    .profile__container {
+      position: relative;
+      display: inline-block;
+      margin-left: auto;
+    }
+
+    .profile__icon {
+      font-size: 24px;
+      cursor: pointer;
+      color: white; /* White color for the icon */
+      font-weight: bold; /* Make the icon bold */
+      transition: transform 0.3s ease; /* Smooth animation */
+    }
+
+    .profile__container {
+      display: flex;
+      align-items: center;
+    }
+
+    .profile__dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    .profile__dropdown a {
+      display: block;
+      padding: 10px 15px;
+      color: #333;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .service__grid {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: stretch; /* Ensures equal height */
+}
+
+.service__card {
+  flex: 1; /* Ensures all cards take the same space */
+  height: 300px; /* Adjust height as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.service__content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.service__background {
+  height: 200px; /* Adjust image height */
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+    .profile__dropdown a:hover {
+      background-color: #f0f0f0;
+    }
+
+    .profile__icon:hover {
+      transform: scale(1.2); /* Slightly increase the size */
+    }
+
+    /* Responsive styling */
+    @media (max-width: 768px) {
+      .profile__icon {
+        font-size: 20px; /* Smaller icon on mobile */
+      }
+
+      .profile__dropdown {
+        position: static;
+        box-shadow: none;
+        width: 100%;
+        background-color: #fff;
+      }
+
+      .profile__dropdown a {
+        padding: 12px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav>
+      <div class="nav__bar">
+        <div class="nav__header">
+          <div class="nav__logo">
+            <a href="#">Green Investment portal<span>$</span></a>
+          </div>
+          <div class="nav__menu__btn" id="menu-btn">
+            <span><i class="ri-menu-3-line"></i></span>
+          </div>
+        </div>
+        <!-- Profile Icon Container -->
+        <div class="profile__container">
+          <span id="profile-icon" class="profile__icon">👤</span>
+          <!-- Profile Dropdown Menu -->
+          <div id="profile-dropdown" class="profile__dropdown">
+            <a href="#" class="dropdown-link">Profile</a>
+            <a href="#" id="logout" class="dropdown-link">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <section class="section__container">
+    <section class="section__container service__container" id="investment-plans">
+      <div class="service__grid">
+      
+        <!-- Investment Service Cards -->
+        <div class="service__card service__card--long-investment" id="long-investment-card">
+          <span><i class="ri-time-line"></i></span>
+          <div class="service__content">
+            <h4>Anual-40 Investment</h4>
+            <p></p>
+          </div>
+          <img src="assets/c.jpeg" alt="Long Investment" class="service__background" />
+        </div>
+        <div class="service__card service__card--stokvela" id="stokvela-card">
+          <span><i class="ri-group-line"></i></span>
+          <div class="service__content">
+            <h4>Stokvela</h4>
+            <p></p>
+          </div>
+          <img src="assets/a.jpeg" alt="Stokvela" class="service__background" />
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <footer class="footer">
+    <div class="section__container footer__container">
+      <!-- Footer Content -->
+    </div>
+  </footer>
+
+  <script>
+    // Toggle the profile dropdown
+  const profileIcon = document.getElementById('profile-icon');
+  const profileDropdown = document.getElementById('profile-dropdown');
+
+  profileIcon.addEventListener('click', function () {
+    profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (event) {
+    if (!profileIcon.contains(event.target) && !profileDropdown.contains(event.target)) {
+      profileDropdown.style.display = 'none';
+    }
+  });
+
+  // Logout functionality
+  const logoutButton = document.getElementById('logout');
+  logoutButton.addEventListener('click', function () {
+    window.location.href = 'login.html'; // Redirect to login page
+  });
+
+  // Navigate to respective pages when clicking investment options
+  document.getElementById('long-investment-card').addEventListener('click', function () {
+    window.location.href = 'longinvestment.html';
+  });
+
+  document.getElementById('stokvela-card').addEventListener('click', function () {
+    window.location.href = 'stokvela.html';
+  });
+
+ 
+  // Display the logged-in user's name (if available)
+  window.onload = function() {
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (loggedInUser) {
+      document.getElementById('profile-icon').innerText = `Hello, ${loggedInUser}`;
+    }
+  };
+  </script>
+</body>
+</html>

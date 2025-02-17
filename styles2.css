@@ -1,0 +1,238 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: gold;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.top-nav {
+  background-color: #222;
+  padding: 15px;
+  text-align: center;
+  color: gold;
+  font-size: 20px;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#scrolling-message-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background-color: black;
+}
+
+#scrolling-message {
+  white-space: nowrap;
+  position: absolute;
+  animation: scrollMessage 20s linear infinite;
+  font-size: 20px;
+  color: white;
+}
+
+@keyframes scrollMessage {
+  from {
+    left: 100%;
+  }
+  to {
+    left: -100%;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.investment-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.chart-container {
+  width: 300px;
+  height: 300px;
+}
+
+table {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: #388E3C;
+  color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid gold;
+}
+
+th {
+  background-color: #2C6B2F;
+}
+
+.progress-container {
+  width: 100%;
+  background-color: #444;
+  border-radius: 4px;
+}
+
+.progress-bar {
+  height: 10px;
+  background-color: gold;
+  border-radius: 4px;
+}
+
+.calendar {
+  background-color: #222;
+  padding: 10px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.invest-button {
+  background-color: gold;
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.payment-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.payment-option {
+  cursor: pointer;
+  border: 2px solid gold;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.payment-option img {
+  width: 100px;
+  height: auto;
+}
+
+.swal2-popup {
+  background-color: #121212;
+  color: gold;
+}
+
+.swal2-input, .swal2-file, .swal2-select {
+  background-color: #222;
+  color: gold;
+  border: 1px solid gold;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+.swal2-input::placeholder, .swal2-file::placeholder {
+  color: #888;
+}
+
+.swal2-checkbox label {
+  color: gold;
+}
+
+.swal2-confirm {
+  background-color: gold;
+  color: black;
+}
+
+.swal2-cancel {
+  background-color: #444;
+  color: gold;
+}
+
+.terms-link {
+  color: gold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.payment-instructions {
+  background-color: #2C6B2F;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.payment-instructions p {
+  margin: 5px 0;
+}
+
+.top-nav {
+  height: 60px;
+  line-height: 60px;
+  background-color: rgba(46, 204, 113, 0.7);
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-bottom: 3px solid rgba(39, 174, 96, 0.8);
+}
+
+.scrolling-text {
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.invest-button, .withdraw-button {
+  width: 150px;
+  height: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.invest-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.withdraw-button {
+  background-color: green;
+  color: white;
+}
+
+.invest-button:hover, .withdraw-button:hover {
+  opacity: 0.9;
+}

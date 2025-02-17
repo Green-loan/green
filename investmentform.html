@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Payment Form</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: gold;
+      text-align: center;
+      padding: 20px;
+    }
+    .top-nav {
+      background-color: #222;
+      padding: 10px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .form-container {
+      background-color: #222;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(255, 215, 0, 0.5);
+    }
+    .form-container input,
+    .form-container select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid gold;
+      background-color: #333;
+      color: gold;
+      font-size: 16px;
+    }
+    .form-container button {
+      background-color: gold;
+      color: black;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      width: 100%;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .form-container button:hover {
+      background-color: darkgoldenrod;
+    }
+    .terms {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .back-icon {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: gold;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .bank-details {
+      margin-top: 15px;
+      font-size: 14px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-nav">Investment Platform</div>
+  <a href="longinvestment.html" class="back-icon">&#8592; Back</a>
+  <h1>Investment Payment Form</h1>
+  <div class="bank-details">
+    <p id="bank-details">Banking Details: Loading...</p>
+    <p><strong>Do not fill out this form if you didn't make a payment, you will be rejected.</strong></p>
+  </div>
+  <div class="form-container">
+    <form id="investmentForm">
+      <input type="text" id="fullName" placeholder="Full Name" required>
+      <input type="text" id="idNumber" placeholder="ID Number" required>
+      <input type="text" id="address" placeholder="Address" required>
+      <input type="number" id="amountInvesting" placeholder="Amount Investing" required>
+      <input type="number" id="amountToReceive" placeholder="Amount to Receive" readonly>
+      <input type="number" id="investmentPeriod" placeholder="Period of Investment (Years)" required>
+      <input type="text" id="accountNumber" placeholder="Account Number" required>
+      <select id="bank" required>
+        <option value="">Select Bank</option>
+        <option value="Capitec">Capitec</option>
+        <option value="ABSA">ABSA</option>
+        <option value="Standard Bank">Standard Bank</option>
+        <option value="FNB">FNB</option>
+      </select>
+      <input type="file" id="proofOfPayment" required>
+      <div class="terms">
+        <input type="checkbox" id="termsCheckbox" required>
+        <label for="termsCheckbox">I agree to the <a href="terms.html" target="_blank">Terms and Conditions</a></label>
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCWoEdf5p3T8DfJX3IWw3s6PNWKjXdo9-s",
+      authDomain: "robot-1ed2b.firebaseapp.com",
+      databaseURL: "https://robot-1ed2b-default-rtdb.firebaseio.com",
+      projectId: "robot-1ed2b",
+      storageBucket: "robot-1ed2b.appspot.com",
+      messagingSenderId: "71843575877",
+      appId: "1:71843575877:android:61b8b09dc5bf5d21158b2c",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const investmentsRef = ref(database, "investments");
+    const accountRef = ref(database, "account_number");
+
+    // Fetch account details from Firebase and display it
+    get(accountRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        document.getElementById("bank-details").innerText = `Banking Details: ${snapshot.val()}`;
+        document.getElementById("accountNumber").value = snapshot.val().split(":")[1].trim(); // Set the account number in the input
+      } else {
+        console.log("No account data available");
+      }
+    });
+
+    function updateAmountToReceive() {
+      let amountInvesting = parseFloat(document.getElementById("amountInvesting").value) || 0;
+      let investmentPeriod = parseFloat(document.getElementById("investmentPeriod").value) || 1;
+      document.getElementById("amountToReceive").value = (amountInvesting * 1.4 * investmentPeriod).toFixed(2);
+    }
+
+    document.getElementById("amountInvesting").addEventListener("input", updateAmountToReceive);
+    document.getElementById("investmentPeriod").addEventListener("input", updateAmountToReceive);
+
+    document.getElementById("investmentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const now = new Date();
+      const timestamp = now.toISOString();
+      const data = {
+        fullName: document.getElementById("fullName").value.trim(),
+        idNumber: document.getElementById("idNumber").value.trim(),
+        address: document.getElementById("address").value.trim(),
+        amountInvesting: document.getElementById("amountInvesting").value,
+        amountToReceive: document.getElementById("amountToReceive").value,
+        investmentPeriod: document.getElementById("investmentPeriod").value,
+        accountNumber: document.getElementById("accountNumber").value.trim(),
+        bank: document.getElementById("bank").value,
+        timestamp: timestamp,
+        isConfirmed: false,
+        isActive: false,
+      };
+
+      await push(investmentsRef, data);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Investment Submitted',
+        text: 'Your investment details have been successfully recorded!'
+      }).then(() => {
+        document.getElementById("investmentForm").reset();
+        document.getElementById("amountToReceive").value = "";
+      });
+    });
+  </script>
+</body>
+</html>
